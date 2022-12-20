@@ -1,0 +1,2 @@
+# hist
+Improved shell history
