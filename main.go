@@ -19,9 +19,16 @@ type ListCmd struct {
 	Limit        int  `arg:"-l,--limit" default:"-1"`
 }
 
+type DeleteCmd struct {
+	Ids      []int64 `arg:"-i,--id"`
+	Prefix   string  `arg:"-p,--prefix"`
+	MaxCount int64   `arg:"--max-count" help:"Delete all records with a count of at most max-count"`
+}
+
 var args struct {
 	Record *RecordCmd `arg:"subcommand:record"`
 	List   *ListCmd   `arg:"subcommand:list"`
+	Delete *DeleteCmd `arg:"subcommand:delete"`
 	Config string     `arg:"--config" default:"~/.config/hist/config.yml"`
 }
 
@@ -54,6 +61,17 @@ func main() {
 		err = c.Update(command)
 		if err != nil {
 			log.WithError(err).WithField("command", command).Error("Unable to record command")
+
+		}
+	case args.Delete != nil:
+		deleteCmd := args.Delete
+		options := client.DeleteOptions{
+			Ids:    deleteCmd.Ids,
+			Prefix: deleteCmd.Prefix,
+		}
+		err = c.Delete(options)
+		if err != nil {
+			log.WithError(err).WithField("options", options).Error("Unable to delete entry")
 		}
 	}
 }

@@ -5,7 +5,7 @@ import (
 )
 
 type Record struct {
-	Id         int
+	Id         int64
 	Command    string
 	LastUpdate time.Time
 	Count      uint64

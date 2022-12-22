@@ -1,18 +1,18 @@
 package client
 
 import (
-	"database/sql"
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type Client struct {
 	Path string
-	db   *sql.DB
+	db   *sqlx.DB
 }
 
 func NewClient(path string) (*Client, error) {
-	db, err := sql.Open("sqlite3", path)
+	db, err := sqlx.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("client.NewClient: open: %w", err)
 	}
