@@ -2,6 +2,7 @@ package client
 
 import (
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/herzrasen/hist/record"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -40,5 +41,16 @@ func TestClient_List(t *testing.T) {
 		require.NoError(t, err)
 		assert.Len(t, records, 0)
 	})
+}
 
+func TestListOptions_ToString(t *testing.T) {
+	// records are sorted by list and not by ToString
+	records := []record.Record{
+		{Id: 2, Command: "command-2", LastUpdate: time.Now().Add(-1 * time.Second), Count: 8},
+		{Id: 1, Command: "command-1", LastUpdate: time.Now(), Count: 5},
+	}
+	options := ListOptions{NoLastUpdate: true}
+	got := options.ToString(records)
+	wanted := "8\tcommand-2\n5\tcommand-1\n"
+	assert.Equal(t, wanted, got)
 }
