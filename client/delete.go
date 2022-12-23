@@ -7,7 +7,6 @@ import (
 
 const (
 	stmtDeleteByIds    = `DELETE FROM hist WHERE id IN (?)`
-	stmtSelectByPrefix = `SELECT id, command, last_update, count FROM hist WHERE command LIKE ?`
 	stmtDeleteByPrefix = `DELETE FROM hist WHERE command LIKE ?`
 )
 
@@ -30,7 +29,7 @@ func (c *Client) deleteByIds(options DeleteOptions) error {
 	if err != nil {
 		return fmt.Errorf("hist.Client.Delete: in: %w", err)
 	}
-	_, err = c.db.Exec(query, args...)
+	_, err = c.Db.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("hist.Client.Delete: exec: %w", err)
 	}
@@ -39,7 +38,7 @@ func (c *Client) deleteByIds(options DeleteOptions) error {
 
 func (c *Client) deleteByPrefix(options DeleteOptions) error {
 	prefix := fmt.Sprintf("%s%%", options.Prefix)
-	res, err := c.db.Exec(stmtDeleteByPrefix, prefix)
+	res, err := c.Db.Exec(stmtDeleteByPrefix, prefix)
 	if err != nil {
 		return fmt.Errorf("hist.Client.Delete: exec prefix: %w", err)
 	}

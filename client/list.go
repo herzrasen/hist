@@ -2,13 +2,11 @@ package client
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"github.com/herzrasen/hist/record"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 	"sort"
 	"strings"
-	"time"
 )
 
 const (
@@ -39,7 +37,7 @@ func (c *Client) List(options ListOptions) ([]record.Record, error) {
 		return nil, fmt.Errorf("client.Client.List: build query: %w", err)
 	}
 
-	rows, err := c.db.Query(statement, args...)
+	rows, err := c.Db.Query(statement, args...)
 	if err != nil {
 		return nil, fmt.Errorf("client.Client.List: query: %w", err)
 	}
@@ -87,18 +85,14 @@ func (l *ListOptions) sort(records []record.Record) {
 }
 
 func (l *ListOptions) ToString(records []record.Record) string {
+	options := record.FormatOptions{
+		NoLastUpdate: l.NoLastUpdate,
+		NoCount:      l.NoCount,
+		WithId:       l.WithId,
+	}
 	buf := strings.Builder{}
 	for _, r := range records {
-		if !l.NoLastUpdate {
-			buf.WriteString(color.GreenString("%s\t", r.LastUpdate.Format(time.RFC1123)))
-		}
-		if !l.NoCount {
-			buf.WriteString(color.BlueString("%d\t", r.Count))
-		}
-		if l.WithId {
-			buf.WriteString(color.YellowString("%d\t", r.Id))
-		}
-		buf.WriteString(fmt.Sprintf("%s\n", r.Command))
+		buf.WriteString(fmt.Sprintf("%s\n", r.Format(options)))
 	}
 	return buf.String()
 }

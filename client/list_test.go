@@ -1,59 +1,44 @@
 package client
 
 import (
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"os"
 	"testing"
 	"time"
 )
 
 func TestClient_List(t *testing.T) {
 	t.Run("succeed with empty ListOptions", func(t *testing.T) {
-		c, err := CreateTestClient(t)
-		require.NoError(t, err)
-		defer os.Remove(c.Path)
-		if err = c.Update("test-command-1"); err != nil {
-			t.FailNow()
-		}
-		time.Sleep(100 * time.Millisecond)
-		if err = c.Update("test-command-2"); err != nil {
-			t.FailNow()
-		}
-		time.Sleep(100 * time.Millisecond)
-		if err = c.Update("test-command-1"); err != nil {
-			t.FailNow()
-		}
+		db, mock, _ := sqlmock.New()
+		mock.ExpectQuery("SELECT id, command, last_update, count FROM hist ORDER BY last_update DESC").
+			WillReturnRows(sqlmock.NewRows([]string{"id", "command", "last_update", "count"}).
+				AddRow(1, "test-command-1", time.Now(), 42).
+				AddRow(2, "test-command-2", time.Now().Add(-1*time.Minute), 10))
+		c := Client{Db: sqlx.NewDb(db, "sqlite3")}
 		records, err := c.List(ListOptions{})
 		require.NoError(t, err)
 		assert.Len(t, records, 2)
 		r0 := records[0]
 		assert.Equal(t, "test-command-2", r0.Command)
-		assert.Equal(t, uint64(1), r0.Count)
+		assert.Equal(t, uint64(10), r0.Count)
 		r1 := records[1]
 		assert.Equal(t, "test-command-1", r1.Command)
-		assert.Equal(t, uint64(2), r1.Count)
+		assert.Equal(t, uint64(42), r1.Count)
 	})
 
-	t.Run("succeed with selection by ids", func(t *testing.T) {
-		c, err := CreateTestClient(t)
+	t.Run("succeed with specified ids", func(t *testing.T) {
+		db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+		mock.ExpectQuery(`SELECT id, command, last_update, count 
+				FROM hist WHERE id IN (?, ?, ?) ORDER BY last_update DESC`).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "command", "last_update", "count"}))
+		c := Client{Db: sqlx.NewDb(db, "sqlite3")}
+		records, err := c.List(ListOptions{
+			Ids: []int64{100, 101, 102},
+		})
 		require.NoError(t, err)
-		defer os.Remove(c.Path)
-		if err = c.Update("test-command-1"); err != nil {
-			t.FailNow()
-		}
-		if err = c.Update("test-command-2"); err != nil {
-			t.FailNow()
-		}
-		if err = c.Update("test-command-3"); err != nil {
-			t.FailNow()
-		}
-		// select the records to get the ids
-		records, err := c.List(ListOptions{})
-		require.NoError(t, err)
-		assert.Len(t, records, 3)
-		ids := []int64{records[1].Id, records[2].Id}
-		recordsByIds, err := c.List(ListOptions{Ids: ids})
-		assert.Len(t, recordsByIds, 2)
+		assert.Len(t, records, 0)
 	})
+
 }
