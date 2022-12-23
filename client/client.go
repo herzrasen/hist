@@ -8,10 +8,10 @@ import (
 
 type Client struct {
 	Path string
-	db   *sqlx.DB
+	Db   *sqlx.DB
 }
 
-func NewClient(path string) (*Client, error) {
+func NewSqliteClient(path string) (*Client, error) {
 	db, err := sqlx.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("client.NewClient: open: %w", err)
@@ -25,5 +25,5 @@ func NewClient(path string) (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("client.NewClient: create table: %w", err)
 	}
-	return &Client{Path: path, db: db}, nil
+	return &Client{Path: path, Db: db}, nil
 }

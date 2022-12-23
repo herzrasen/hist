@@ -7,10 +7,9 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	c, err := CreateTestClient(t)
-	require.NoError(t, err)
+	c := CreateTestClient(t)
 	defer os.Remove(c.Path)
-	rows, err := c.db.Query("SELECT name FROM sqlite_schema")
+	rows, err := c.Db.Query("SELECT name FROM sqlite_schema")
 	require.NoError(t, err)
 	defer rows.Close()
 	var tableExists bool
@@ -27,9 +26,11 @@ func TestNewClient(t *testing.T) {
 	}
 }
 
-func CreateTestClient(t *testing.T) (*Client, error) {
+func CreateTestClient(t *testing.T) *Client {
 	t.Helper()
 	dbPath, err := os.CreateTemp("../", "test-*")
 	require.NoError(t, err)
-	return NewClient(dbPath.Name())
+	c, err := NewSqliteClient(dbPath.Name())
+	require.NoError(t, err)
+	return c
 }
