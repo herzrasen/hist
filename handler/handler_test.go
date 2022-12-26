@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/herzrasen/hist/args"
+	"github.com/herzrasen/hist/config"
 	"github.com/herzrasen/hist/handler/mocks"
 	"github.com/herzrasen/hist/record"
 	"github.com/stretchr/testify/mock"
@@ -34,7 +35,10 @@ func TestHandler_Handle(t *testing.T) {
 	t.Run("handle record", func(t *testing.T) {
 		m := mocks.NewHistClient(t)
 		m.On("Update", mock.Anything).Return(nil)
-		h := Handler{Client: m}
+		h := Handler{
+			Client: m,
+			Config: &config.Config{},
+		}
 		err := h.Handle(args.Args{
 			Record: &args.RecordCmd{Command: "ls -alF"},
 		})
@@ -44,7 +48,10 @@ func TestHandler_Handle(t *testing.T) {
 	t.Run("record error", func(t *testing.T) {
 		m := mocks.NewHistClient(t)
 		m.On("Update", mock.Anything).Return(errors.New("some error"))
-		h := Handler{Client: m}
+		h := Handler{
+			Client: m,
+			Config: &config.Config{},
+		}
 		err := h.Handle(args.Args{
 			Record: &args.RecordCmd{Command: "ls -alF"},
 		})
@@ -54,9 +61,12 @@ func TestHandler_Handle(t *testing.T) {
 	t.Run("handle delete", func(t *testing.T) {
 		m := mocks.NewHistClient(t)
 		m.On("Delete", mock.Anything).Return(nil)
-		h := Handler{Client: m}
+		h := Handler{
+			Client: m,
+			Config: &config.Config{},
+		}
 		err := h.Handle(args.Args{
-			Delete: &args.DeleteCmd{Prefix: "foo"},
+			Delete: &args.DeleteCmd{Filter: "foo"},
 		})
 		require.NoError(t, err)
 	})
@@ -64,9 +74,12 @@ func TestHandler_Handle(t *testing.T) {
 	t.Run("delete error", func(t *testing.T) {
 		m := mocks.NewHistClient(t)
 		m.On("Delete", mock.Anything).Return(errors.New("some error"))
-		h := Handler{Client: m}
+		h := Handler{
+			Client: m,
+			Config: &config.Config{},
+		}
 		err := h.Handle(args.Args{
-			Delete: &args.DeleteCmd{Prefix: "foo"},
+			Delete: &args.DeleteCmd{Filter: "foo"},
 		})
 		require.Error(t, err)
 	})

@@ -7,19 +7,19 @@ import (
 
 const (
 	stmtDeleteByIds    = `DELETE FROM hist WHERE id IN (?)`
-	stmtDeleteByPrefix = `DELETE FROM hist WHERE command LIKE ?`
+	stmtDeleteByFilter = `DELETE FROM hist WHERE command LIKE ?`
 )
 
 type DeleteOptions struct {
 	Ids    []int64
-	Prefix string
+	Filter string
 }
 
 func (c *Client) Delete(options DeleteOptions) error {
 	if len(options.Ids) > 0 {
 		return c.deleteByIds(options)
-	} else if options.Prefix != "" {
-		return c.deleteByPrefix(options)
+	} else if options.Filter != "" {
+		return c.deleteByFilter(options)
 	}
 	return nil
 }
@@ -36,9 +36,9 @@ func (c *Client) deleteByIds(options DeleteOptions) error {
 	return nil
 }
 
-func (c *Client) deleteByPrefix(options DeleteOptions) error {
-	prefix := fmt.Sprintf("%s%%", options.Prefix)
-	res, err := c.Db.Exec(stmtDeleteByPrefix, prefix)
+func (c *Client) deleteByFilter(options DeleteOptions) error {
+	prefix := fmt.Sprintf("%s%%", options.Filter)
+	res, err := c.Db.Exec(stmtDeleteByFilter, prefix)
 	if err != nil {
 		return fmt.Errorf("hist.Client.Delete: exec prefix: %w", err)
 	}

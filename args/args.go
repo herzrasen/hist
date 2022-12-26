@@ -13,7 +13,7 @@ type ListCmd struct {
 
 type DeleteCmd struct {
 	Ids      []int64 `arg:"-i,--id"`
-	Prefix   string  `arg:"-p,--prefix"`
+	Filter   string  `arg:"-f,--filter"`
 	MaxCount int64   `arg:"--max-count" help:"Delete all records with a count of at most max-count"`
 }
 

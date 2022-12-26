@@ -9,13 +9,13 @@ import (
 )
 
 func TestClient_Delete(t *testing.T) {
-	t.Run("delete by prefix", func(t *testing.T) {
+	t.Run("delete by filter", func(t *testing.T) {
 		db, mock, _ := sqlmock.New()
 		mock.ExpectExec("DELETE FROM hist WHERE command LIKE ?").
 			WithArgs("test-command%").
 			WillReturnResult(sqlmock.NewResult(0, 2))
 		c := Client{Db: sqlx.NewDb(db, "sqlite3")}
-		err := c.Delete(DeleteOptions{Prefix: "test-command"})
+		err := c.Delete(DeleteOptions{Filter: "test-command"})
 		require.NoError(t, err)
 	})
 
@@ -38,12 +38,12 @@ func TestClient_Delete(t *testing.T) {
 		require.Error(t, err)
 	})
 
-	t.Run("exec returns err with prefix", func(t *testing.T) {
+	t.Run("exec returns err with filter", func(t *testing.T) {
 		db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 		mock.ExpectExec("DELETE FROM hist WHERE command LIKE ?").
 			WillReturnError(errors.New("some error"))
 		c := Client{Db: sqlx.NewDb(db, "sqlite3")}
-		err := c.Delete(DeleteOptions{Prefix: "test"})
+		err := c.Delete(DeleteOptions{Filter: "test"})
 		require.Error(t, err)
 	})
 }
