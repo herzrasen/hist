@@ -10,13 +10,21 @@ import (
 
 func TestClient_Delete(t *testing.T) {
 	t.Run("delete by filter", func(t *testing.T) {
-		db, mock, _ := sqlmock.New()
-		mock.ExpectExec("DELETE FROM hist WHERE command LIKE ?").
-			WithArgs("test-command%").
+		db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+		mock.ExpectExec("DELETE FROM hist WHERE regexp('^test-command.*', command) = true").
 			WillReturnResult(sqlmock.NewResult(0, 2))
 		c := Client{Db: sqlx.NewDb(db, "sqlite3")}
-		err := c.Delete(DeleteOptions{Filter: "test-command"})
+		err := c.Delete(DeleteOptions{Pattern: "^test-command.*"})
 		require.NoError(t, err)
+	})
+
+	t.Run("exec returns err with filter", func(t *testing.T) {
+		db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+		mock.ExpectExec("DELETE FROM hist WHERE regexp('test', command) = true").
+			WillReturnError(errors.New("some error"))
+		c := Client{Db: sqlx.NewDb(db, "sqlite3")}
+		err := c.Delete(DeleteOptions{Pattern: "test"})
+		require.Error(t, err)
 	})
 
 	t.Run("delete by ids", func(t *testing.T) {
@@ -38,12 +46,4 @@ func TestClient_Delete(t *testing.T) {
 		require.Error(t, err)
 	})
 
-	t.Run("exec returns err with filter", func(t *testing.T) {
-		db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-		mock.ExpectExec("DELETE FROM hist WHERE command LIKE ?").
-			WillReturnError(errors.New("some error"))
-		c := Client{Db: sqlx.NewDb(db, "sqlite3")}
-		err := c.Delete(DeleteOptions{Filter: "test"})
-		require.Error(t, err)
-	})
 }

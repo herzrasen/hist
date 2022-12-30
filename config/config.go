@@ -4,11 +4,15 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"os"
+	"regexp"
 	"strings"
 )
 
-type Config struct {
+type Patterns struct {
 	Excludes []string `yaml:"excludes"`
+}
+type Config struct {
+	Patterns Patterns `yaml:"patterns"`
 }
 
 func Load(path string) (*Config, error) {
@@ -39,11 +43,12 @@ func resolvePath(path string) (string, error) {
 }
 
 func (c *Config) IsExcluded(s string) bool {
-	if c.Excludes == nil {
-		return false
-	}
-	for _, exclude := range c.Excludes {
-		if s == exclude {
+	for _, pattern := range c.Patterns.Excludes {
+		matches, err := regexp.MatchString(pattern, s)
+		if err != nil {
+			continue
+		}
+		if matches {
 			return true
 		}
 	}

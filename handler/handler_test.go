@@ -66,7 +66,7 @@ func TestHandler_Handle(t *testing.T) {
 			Config: &config.Config{},
 		}
 		err := h.Handle(args.Args{
-			Delete: &args.DeleteCmd{Filter: "foo"},
+			Delete: &args.DeleteCmd{Pattern: "foo"},
 		})
 		require.NoError(t, err)
 	})
@@ -79,8 +79,35 @@ func TestHandler_Handle(t *testing.T) {
 			Config: &config.Config{},
 		}
 		err := h.Handle(args.Args{
-			Delete: &args.DeleteCmd{Filter: "foo"},
+			Delete: &args.DeleteCmd{Pattern: "foo"},
 		})
 		require.Error(t, err)
 	})
+
+	t.Run("handle get", func(t *testing.T) {
+		m := mocks.NewHistClient(t)
+		m.On("Get", mock.Anything).Return("some-command", nil)
+		h := Handler{
+			Client: m,
+			Config: &config.Config{},
+		}
+		err := h.Handle(args.Args{
+			Get: &args.GetCmd{Index: 101},
+		})
+		require.NoError(t, err)
+	})
+
+	t.Run("get error", func(t *testing.T) {
+		m := mocks.NewHistClient(t)
+		m.On("Get", mock.Anything).Return("", errors.New("some error"))
+		h := Handler{
+			Client: m,
+			Config: &config.Config{},
+		}
+		err := h.Handle(args.Args{
+			Get: &args.GetCmd{Index: 101},
+		})
+		require.Error(t, err)
+	})
+
 }

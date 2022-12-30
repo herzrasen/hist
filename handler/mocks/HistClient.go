@@ -29,6 +29,27 @@ func (_m *HistClient) Delete(options client.DeleteOptions) error {
 	return r0
 }
 
+// Get provides a mock function with given fields: index
+func (_m *HistClient) Get(index int64) (string, error) {
+	ret := _m.Called(index)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(int64) string); ok {
+		r0 = rf(index)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(int64) error); ok {
+		r1 = rf(index)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // List provides a mock function with given fields: options
 func (_m *HistClient) List(options client.ListOptions) ([]record.Record, error) {
 	ret := _m.Called(options)
