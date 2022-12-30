@@ -5,7 +5,9 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/herzrasen/hist/client"
 	"github.com/herzrasen/hist/record"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/rivo/tview"
+	"sort"
 	"strings"
 )
 
@@ -24,7 +26,8 @@ type Searcher struct {
 func NewSearcher(listClient ListClient) *Searcher {
 	list := tview.NewList().
 		ShowSecondaryText(false).
-		SetShortcutStyle(tcell.Style{})
+		SetShortcutStyle(tcell.Style{}).
+		SetWrapAround(true)
 	input := tview.NewInputField()
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(list, 0, 20, false).
@@ -79,9 +82,22 @@ func (s *Searcher) Show() error {
 	if err != nil {
 		return fmt.Errorf("search:Searcher:Show: list: %w", err)
 	}
+	var commands []string
 	for _, rec := range records {
-		s.List.AddItem(rec.Command, "", 0, nil)
+		commands = append(commands, rec.Command)
 	}
+	for _, command := range commands {
+		s.List.AddItem(command, "", 0, nil)
+	}
+	s.Input.SetChangedFunc(func(text string) {
+		ranks := fuzzy.RankFind(text, commands)
+		sort.Reverse(ranks)
+		s.List.Clear()
+		for _, rankedCommand := range ranks {
+			s.List.AddItem(rankedCommand.Target, "", 0, nil)
+		}
+		s.List.SetCurrentItem(len(ranks) - 1)
+	})
 	numItems := s.List.GetItemCount() - 1
 	currentItem, _ := s.List.GetItemText(numItems)
 	s.List.SetCurrentItem(numItems)

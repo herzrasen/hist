@@ -8,6 +8,7 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/gdamore/tcell/v2 v2.5.3
 	github.com/jmoiron/sqlx v1.3.5
+	github.com/lithammer/fuzzysearch v1.1.5
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/rivo/tview v0.0.0-20221221172820-02e38ea9604c
 	github.com/sirupsen/logrus v1.9.0
