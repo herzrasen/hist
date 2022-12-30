@@ -7,13 +7,14 @@ hist_record() {
 add-zsh-hook preexec hist_record
 
 hist-backward-widget() {
-    __HIST_COMMAND_INDEX=$((__HIST_COMMAND_INDEX+1))
-    command=$(hist get --index $__HIST_COMMAND_INDEX)
+    __HIST_DIRECTION=1
+    command=$(hist get --index ${__HIST_COMMAND_INDEX:=0})
     ret=$?
     if [ $ret -ne 0 ]; then
         zle reset-prompt
         return $ret
     fi
+    __HIST_COMMAND_INDEX=$((__HIST_COMMAND_INDEX+1))
     BUFFER=$command
     zle vi-add-eol
 }
@@ -24,7 +25,11 @@ bindkey -M viins "^[[A"     hist-backward-widget
 bindkey -M vicmd "^[[A"     hist-backward-widget
 
 hist-forward-widget() {
-    if [ $__HIST_COMMAND_INDEX -gt 0 ]; then
+    if [ ${__HIST_DIRECTION:=0} -eq 1 ]; then
+        __HIST_COMMAND_INDEX=$((__HIST_COMMAND_INDEX-1))
+        __HIST_DIRECTION=0
+    fi
+    if [ ${__HIST_COMMAND_INDEX:=0} -gt 0 ]; then
         __HIST_COMMAND_INDEX=$((__HIST_COMMAND_INDEX-1))
         command=$(hist get --index $__HIST_COMMAND_INDEX)
         ret=$?
@@ -34,6 +39,9 @@ hist-forward-widget() {
         fi
         BUFFER=$command
         zle vi-add-eol
+    else
+        __HIST_COMMAND_INDEX=0
+        zle push-line
     fi
 }
 
