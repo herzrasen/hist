@@ -9,12 +9,8 @@ import (
 	"strings"
 )
 
-const (
-	stmtSelect      = `SELECT id, command, last_update, count FROM hist ORDER BY last_update DESC`
-	stmtSelectByIds = `SELECT id, command, last_update, count FROM hist WHERE id IN (?) ORDER BY last_update DESC`
-)
-
 type ListOptions struct {
+	Reverse      bool
 	NoCount      bool
 	NoLastUpdate bool
 	WithId       bool
@@ -58,7 +54,9 @@ func (c *Client) List(options ListOptions) ([]record.Record, error) {
 
 func buildListQuery(options ListOptions) (string, []interface{}, error) {
 	query := strings.Builder{}
-	query.WriteString(stmtSelect)
+	query.WriteString(`SELECT id, command, last_update, count 
+		FROM hist 
+		ORDER BY last_update DESC`)
 	if options.Limit > 0 {
 		query.WriteString(" LIMIT ?")
 		return query.String(), []interface{}{options.Limit}, nil
@@ -68,7 +66,10 @@ func buildListQuery(options ListOptions) (string, []interface{}, error) {
 
 func buildByIdsQuery(options ListOptions) (string, []interface{}, error) {
 	statement := strings.Builder{}
-	statement.WriteString(stmtSelectByIds)
+	statement.WriteString(`SELECT id, command, last_update, count
+		FROM hist 
+		WHERE id IN (?) 
+		ORDER BY last_update DESC`)
 	if options.Limit > 0 {
 		statement.WriteString(" LIMIT ?")
 		return sqlx.In(statement.String(), options.Ids, options.Limit)
@@ -80,7 +81,11 @@ func (l *ListOptions) sort(records []record.Record) {
 	sort.Slice(records, func(i, j int) bool {
 		left := records[i]
 		right := records[j]
-		return left.LastUpdate.Before(right.LastUpdate)
+		if l.Reverse {
+			return left.LastUpdate.After(right.LastUpdate)
+		} else {
+			return left.LastUpdate.Before(right.LastUpdate)
+		}
 	})
 }
 

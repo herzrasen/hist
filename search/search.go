@@ -42,7 +42,9 @@ func NewSearcher(listClient ListClient) *Searcher {
 			list.SetItemText(currentItem, strings.TrimPrefix(oldItemText, "> "), "")
 			switch event.Key() {
 			case tcell.KeyEnter:
-				fmt.Println("hello world")
+				selectedIndex := list.GetCurrentItem()
+				selected, _ := list.GetItemText(selectedIndex)
+				fmt.Printf("%s", selected)
 				return event
 			case tcell.KeyUp:
 				nextItem := 0
@@ -78,7 +80,9 @@ func NewSearcher(listClient ListClient) *Searcher {
 }
 
 func (s *Searcher) Show() error {
-	records, err := s.ListClient.List(client.ListOptions{})
+	records, err := s.ListClient.List(client.ListOptions{
+		Reverse: true,
+	})
 	if err != nil {
 		return fmt.Errorf("search:Searcher:Show: list: %w", err)
 	}
@@ -91,17 +95,15 @@ func (s *Searcher) Show() error {
 	}
 	s.Input.SetChangedFunc(func(text string) {
 		ranks := fuzzy.RankFind(text, commands)
-		sort.Reverse(ranks)
+		sort.Sort(ranks)
 		s.List.Clear()
 		for _, rankedCommand := range ranks {
 			s.List.AddItem(rankedCommand.Target, "", 0, nil)
 		}
-		s.List.SetCurrentItem(len(ranks) - 1)
 	})
-	numItems := s.List.GetItemCount() - 1
-	currentItem, _ := s.List.GetItemText(numItems)
-	s.List.SetCurrentItem(numItems)
-	s.List.SetItemText(numItems, "> "+currentItem, "")
+	currentItem, _ := s.List.GetItemText(0)
+	s.List.SetCurrentItem(0)
+	s.List.SetItemText(0, "> "+currentItem, "")
 	if err := s.App.Run(); err != nil {
 		return fmt.Errorf("search:Searcher:Show: run: %w", err)
 	}

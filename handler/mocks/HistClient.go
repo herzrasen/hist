@@ -74,7 +74,7 @@ func (_m *HistClient) List(options client.ListOptions) ([]record.Record, error) 
 }
 
 // Update provides a mock function with given fields: command
-func (_m *HistClient) Update(command string) error {
+func (_m *HistClient) Record(command string) error {
 	ret := _m.Called(command)
 
 	var r0 error

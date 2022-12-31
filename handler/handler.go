@@ -7,13 +7,12 @@ import (
 	"github.com/herzrasen/hist/config"
 	"github.com/herzrasen/hist/record"
 	"github.com/herzrasen/hist/search"
-	log "github.com/sirupsen/logrus"
 )
 
 type HistClient interface {
 	List(options client.ListOptions) ([]record.Record, error)
 	Get(index int64) (string, error)
-	Update(command string) error
+	Record(command string) error
 	Delete(options client.DeleteOptions) error
 }
 
@@ -27,10 +26,9 @@ func (h *Handler) Handle(a args.Args) error {
 	case a.Record != nil:
 		command := a.Record.Command
 		if h.Config.IsExcluded(command) {
-			log.WithField("command", command).Info("Skipping because command is excluded")
 			return nil
 		}
-		err := h.Client.Update(command)
+		err := h.Client.Record(command)
 		if err != nil {
 			return fmt.Errorf("unable to record command: %w", err)
 		}
@@ -48,6 +46,7 @@ func (h *Handler) Handle(a args.Args) error {
 		}
 	case a.List != nil:
 		options := client.ListOptions{
+			Reverse:      a.List.Reverse,
 			NoCount:      a.List.NoCount,
 			NoLastUpdate: a.List.NoLastUpdate,
 			WithId:       a.List.WithId,

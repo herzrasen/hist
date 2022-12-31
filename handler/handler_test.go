@@ -34,7 +34,7 @@ func TestHandler_Handle(t *testing.T) {
 
 	t.Run("handle record", func(t *testing.T) {
 		m := mocks.NewHistClient(t)
-		m.On("Update", mock.Anything).Return(nil)
+		m.On("Record", mock.Anything).Return(nil)
 		h := Handler{
 			Client: m,
 			Config: &config.Config{},
@@ -47,7 +47,7 @@ func TestHandler_Handle(t *testing.T) {
 
 	t.Run("record error", func(t *testing.T) {
 		m := mocks.NewHistClient(t)
-		m.On("Update", mock.Anything).Return(errors.New("some error"))
+		m.On("Record", mock.Anything).Return(errors.New("some error"))
 		h := Handler{
 			Client: m,
 			Config: &config.Config{},

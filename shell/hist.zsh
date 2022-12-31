@@ -16,7 +16,7 @@ hist-backward-widget() {
     fi
     __HIST_COMMAND_INDEX=$((__HIST_COMMAND_INDEX+1))
     BUFFER=$command
-    zle vi-add-eol
+    CURSOR=$#BUFFER
 }
 
 zle -N                      hist-backward-widget
@@ -38,7 +38,7 @@ hist-forward-widget() {
             return $ret
         fi
         BUFFER=$command
-        zle vi-add-eol
+        CURSOR=$#BUFFER
     else
         __HIST_COMMAND_INDEX=0
         zle push-line
@@ -65,10 +65,10 @@ hist-search-widget() {
         return $ret
     fi
     BUFFER=$command
-    zle vi-add-eol
+    CURSOR=$#BUFFER
 }
 
 zle -N                  hist-search-widget
-bindkey -M emacs '^H'   hist-search-widget
-bindkey -M viins '^H'   hist-search-widget
-bindkey -M vicmd '^H'   hist-search-widget
+bindkey -M emacs '^R'   hist-search-widget
+bindkey -M viins '^R'   hist-search-widget
+bindkey -M vicmd '^R'   hist-search-widget

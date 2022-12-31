@@ -8,6 +8,7 @@ type SearchCmd struct {
 }
 
 type ListCmd struct {
+	Reverse      bool `arg:"--reverse"`
 	NoCount      bool `arg:"--no-count"`
 	NoLastUpdate bool `arg:"--no-last-update"`
 	WithId       bool `arg:"--with-id"`
