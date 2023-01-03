@@ -1,17 +1,24 @@
 autoload -U add-zsh-hook
 
-hist_record() {
+function TRAPINT() {
+    __HIST_COMMAND_INDEX=0
+    zle kill-whole-line
+    # return 128 plus the signal number
+    return $(( 128 + $1 ))
+}
+
+function hist-record() {
     __HIST_COMMAND_INDEX=0
     hist record "$1"
 }
-add-zsh-hook preexec hist_record
+add-zsh-hook preexec hist-record
 
 hist-backward-widget() {
     __HIST_DIRECTION=1
     command=$(hist get --index ${__HIST_COMMAND_INDEX:=0})
     ret=$?
     if [ $ret -ne 0 ]; then
-        zle reset-prompt
+        zle kill-whole-line
         return $ret
     fi
     __HIST_COMMAND_INDEX=$((__HIST_COMMAND_INDEX+1))
@@ -34,14 +41,14 @@ hist-forward-widget() {
         command=$(hist get --index $__HIST_COMMAND_INDEX)
         ret=$?
         if [ $ret -ne 0 ]; then
-            zle reset-prompt
+            zle kill-whole-line
             return $ret
         fi
         BUFFER=$command
         CURSOR=$#BUFFER
     else
         __HIST_COMMAND_INDEX=0
-        zle push-line
+        zle kill-whole-line
     fi
 }
 
@@ -50,18 +57,12 @@ bindkey -M emacs "^[[B"     hist-forward-widget
 bindkey -M viins "^[[B"     hist-forward-widget
 bindkey -M vicmd "^[[B"     hist-forward-widget
 
-TRAPINT() {
-    __HIST_COMMAND_INDEX=0
-    # return 128 plus the signal number
-    return $(( 128 + $1 ))
-}
-
 hist-search-widget() {
-    zle push-line
+    zle kill-whole-line
     command=$(hist search)
     ret=$?
     if [ $ret -ne 0 ]; then
-        zle reset-prompt
+        zle kill-whole-line
         return $ret
     fi
     BUFFER=$command
