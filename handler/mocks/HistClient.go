@@ -7,6 +7,8 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
+	os "os"
+
 	record "github.com/herzrasen/hist/record"
 )
 
@@ -50,6 +52,20 @@ func (_m *HistClient) Get(index int64) (string, error) {
 	return r0, r1
 }
 
+// Import provides a mock function with given fields: file
+func (_m *HistClient) Import(file *os.File) error {
+	ret := _m.Called(file)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*os.File) error); ok {
+		r0 = rf(file)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // List provides a mock function with given fields: options
 func (_m *HistClient) List(options client.ListOptions) ([]record.Record, error) {
 	ret := _m.Called(options)
@@ -73,7 +89,7 @@ func (_m *HistClient) List(options client.ListOptions) ([]record.Record, error) 
 	return r0, r1
 }
 
-// Update provides a mock function with given fields: command
+// Record provides a mock function with given fields: command
 func (_m *HistClient) Record(command string) error {
 	ret := _m.Called(command)
 

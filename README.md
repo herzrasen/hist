@@ -1,2 +1,3 @@
-# hist
-Improved shell history
+# hist - Improved shell history
+
+

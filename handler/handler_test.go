@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"github.com/herzrasen/hist/args"
-	"github.com/herzrasen/hist/config"
 	"github.com/herzrasen/hist/handler/mocks"
 	"github.com/herzrasen/hist/record"
 	"github.com/stretchr/testify/mock"
@@ -37,7 +36,6 @@ func TestHandler_Handle(t *testing.T) {
 		m.On("Record", mock.Anything).Return(nil)
 		h := Handler{
 			Client: m,
-			Config: &config.Config{},
 		}
 		err := h.Handle(args.Args{
 			Record: &args.RecordCmd{Command: "ls -alF"},
@@ -50,7 +48,6 @@ func TestHandler_Handle(t *testing.T) {
 		m.On("Record", mock.Anything).Return(errors.New("some error"))
 		h := Handler{
 			Client: m,
-			Config: &config.Config{},
 		}
 		err := h.Handle(args.Args{
 			Record: &args.RecordCmd{Command: "ls -alF"},
@@ -63,7 +60,6 @@ func TestHandler_Handle(t *testing.T) {
 		m.On("Delete", mock.Anything).Return(nil)
 		h := Handler{
 			Client: m,
-			Config: &config.Config{},
 		}
 		err := h.Handle(args.Args{
 			Delete: &args.DeleteCmd{Pattern: "foo"},
@@ -76,7 +72,6 @@ func TestHandler_Handle(t *testing.T) {
 		m.On("Delete", mock.Anything).Return(errors.New("some error"))
 		h := Handler{
 			Client: m,
-			Config: &config.Config{},
 		}
 		err := h.Handle(args.Args{
 			Delete: &args.DeleteCmd{Pattern: "foo"},
@@ -89,7 +84,6 @@ func TestHandler_Handle(t *testing.T) {
 		m.On("Get", mock.Anything).Return("some-command", nil)
 		h := Handler{
 			Client: m,
-			Config: &config.Config{},
 		}
 		err := h.Handle(args.Args{
 			Get: &args.GetCmd{Index: 101},
@@ -102,7 +96,6 @@ func TestHandler_Handle(t *testing.T) {
 		m.On("Get", mock.Anything).Return("", errors.New("some error"))
 		h := Handler{
 			Client: m,
-			Config: &config.Config{},
 		}
 		err := h.Handle(args.Args{
 			Get: &args.GetCmd{Index: 101},

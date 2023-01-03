@@ -3,32 +3,21 @@ package client
 import (
 	"fmt"
 	"github.com/herzrasen/hist/record"
-	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
-	"sort"
 	"strings"
 )
 
 type ListOptions struct {
+	ByCount      bool
 	Reverse      bool
 	NoCount      bool
 	NoLastUpdate bool
 	WithId       bool
 	Limit        int
-	Ids          []int64
 }
 
 func (c *Client) List(options ListOptions) ([]record.Record, error) {
-	var statement string
-	var args []interface{}
-	var err error
-
-	if len(options.Ids) > 0 {
-		statement, args, err = buildByIdsQuery(options)
-	} else {
-		statement, args, err = buildListQuery(options)
-	}
-
+	statement, args, err := buildListQuery(options)
 	if err != nil {
 		return nil, fmt.Errorf("client.Client.List: build query: %w", err)
 	}
@@ -48,15 +37,22 @@ func (c *Client) List(options ListOptions) ([]record.Record, error) {
 			records = append(records, r)
 		}
 	}
-	options.sort(records)
+
+	if !options.Reverse {
+		records = reverse(records)
+	}
+
 	return records, nil
 }
 
 func buildListQuery(options ListOptions) (string, []interface{}, error) {
 	query := strings.Builder{}
-	query.WriteString(`SELECT id, command, last_update, count 
-		FROM hist 
-		ORDER BY last_update DESC`)
+	query.WriteString(`SELECT id, command, last_update, count FROM hist`)
+	if options.ByCount {
+		query.WriteString(" ORDER BY count, last_update DESC")
+	} else {
+		query.WriteString(" ORDER BY last_update, count DESC")
+	}
 	if options.Limit > 0 {
 		query.WriteString(" LIMIT ?")
 		return query.String(), []interface{}{options.Limit}, nil
@@ -64,29 +60,12 @@ func buildListQuery(options ListOptions) (string, []interface{}, error) {
 	return query.String(), nil, nil
 }
 
-func buildByIdsQuery(options ListOptions) (string, []interface{}, error) {
-	statement := strings.Builder{}
-	statement.WriteString(`SELECT id, command, last_update, count
-		FROM hist 
-		WHERE id IN (?) 
-		ORDER BY last_update DESC`)
-	if options.Limit > 0 {
-		statement.WriteString(" LIMIT ?")
-		return sqlx.In(statement.String(), options.Ids, options.Limit)
+func reverse(records []record.Record) []record.Record {
+	var reversed []record.Record
+	for i := len(records) - 1; i >= 0; i-- {
+		reversed = append(reversed, records[i])
 	}
-	return sqlx.In(statement.String(), options.Ids)
-}
-
-func (l *ListOptions) sort(records []record.Record) {
-	sort.Slice(records, func(i, j int) bool {
-		left := records[i]
-		right := records[j]
-		if l.Reverse {
-			return left.LastUpdate.After(right.LastUpdate)
-		} else {
-			return left.LastUpdate.Before(right.LastUpdate)
-		}
-	})
+	return reversed
 }
 
 func (l *ListOptions) ToString(records []record.Record) string {

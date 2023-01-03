@@ -1,6 +1,7 @@
 package client
 
 import (
+	"github.com/herzrasen/hist/config"
 	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
@@ -8,7 +9,6 @@ import (
 
 func TestNewClient(t *testing.T) {
 	c := CreateTestClient(t)
-	defer os.Remove(c.Path)
 	rows, err := c.Db.Query("SELECT name FROM sqlite_schema")
 	require.NoError(t, err)
 	defer rows.Close()
@@ -30,7 +30,7 @@ func CreateTestClient(t *testing.T) *Client {
 	t.Helper()
 	dbPath, err := os.CreateTemp("../", "test-*")
 	require.NoError(t, err)
-	c, err := NewSqliteClient(dbPath.Name())
+	c, err := NewSqliteClient(dbPath.Name(), &config.Config{})
 	require.NoError(t, err)
 	return c
 }
