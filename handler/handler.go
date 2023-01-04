@@ -15,6 +15,7 @@ type HistClient interface {
 	Record(command string) error
 	Delete(options client.DeleteOptions) error
 	Import(file *os.File) error
+	Tidy() error
 }
 
 type Handler struct {
@@ -74,6 +75,11 @@ func (h *Handler) Handle(a args.Args) error {
 		err = h.Client.Import(file)
 		if err != nil {
 			return fmt.Errorf("unable to import history: %w", err)
+		}
+	case a.Tidy != nil:
+		err := h.Client.Tidy()
+		if err != nil {
+			return fmt.Errorf("unable to tidy hist: %w", err)
 		}
 	}
 	return nil

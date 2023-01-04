@@ -103,6 +103,20 @@ func (_m *HistClient) Record(command string) error {
 	return r0
 }
 
+// Tidy provides a mock function with given fields:
+func (_m *HistClient) Tidy() error {
+	ret := _m.Called()
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func() error); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 type mockConstructorTestingTNewHistClient interface {
 	mock.TestingT
 	Cleanup(func())

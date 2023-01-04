@@ -34,6 +34,9 @@ type ImportCmd struct {
 	Path string `arg:"positional"`
 }
 
+type TidyCmd struct {
+}
+
 type Args struct {
 	Record *RecordCmd `arg:"subcommand:record"`
 	Search *SearchCmd `arg:"subcommand:search"`
@@ -41,5 +44,6 @@ type Args struct {
 	List   *ListCmd   `arg:"subcommand:list"`
 	Delete *DeleteCmd `arg:"subcommand:delete"`
 	Import *ImportCmd `arg:"subcommand:import"`
+	Tidy   *TidyCmd   `arg:"subcommand:tidy"`
 	Config string     `arg:"--config" default:"~/.config/hist/config.yml"`
 }
