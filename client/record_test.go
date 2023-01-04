@@ -19,7 +19,7 @@ func (a AnyTime) Match(v driver.Value) bool {
 	return ok
 }
 
-func TestClient_Update(t *testing.T) {
+func TestClient_Record(t *testing.T) {
 	t.Run("succeed", func(t *testing.T) {
 		db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 		mock.ExpectExec(`INSERT INTO hist (command, last_update) 
