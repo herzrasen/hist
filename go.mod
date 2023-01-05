@@ -3,6 +3,7 @@ module github.com/herzrasen/hist
 go 1.19
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/adrg/xdg v0.4.0
 	github.com/alexflint/go-arg v1.4.3
 	github.com/fatih/color v1.13.0
@@ -17,7 +18,6 @@ require (
 )
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/alexflint/go-scalar v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect

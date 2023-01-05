@@ -5,7 +5,7 @@ import (
 	"github.com/herzrasen/hist/args"
 	"github.com/herzrasen/hist/client"
 	"github.com/herzrasen/hist/record"
-	"github.com/herzrasen/hist/search"
+	"io"
 	"os"
 )
 
@@ -14,12 +14,17 @@ type HistClient interface {
 	Get(index int64) (string, error)
 	Record(command string) error
 	Delete(options client.DeleteOptions) error
-	Import(file *os.File) error
+	Import(reader io.Reader) error
 	Tidy() error
 }
 
+type SearchClient interface {
+	Show() error
+}
+
 type Handler struct {
-	Client HistClient
+	Client   HistClient
+	Searcher SearchClient
 }
 
 func (h *Handler) Handle(a args.Args) error {
@@ -37,8 +42,7 @@ func (h *Handler) Handle(a args.Args) error {
 		}
 		fmt.Printf("%s", command)
 	case a.Search != nil:
-		searcher := search.NewSearcher(h.Client)
-		err := searcher.Show()
+		err := h.Searcher.Show()
 		if err != nil {
 			return fmt.Errorf("unable to show search dialog: %w", err)
 		}

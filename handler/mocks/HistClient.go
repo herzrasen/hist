@@ -5,9 +5,9 @@ package mocks
 import (
 	client "github.com/herzrasen/hist/client"
 
-	mock "github.com/stretchr/testify/mock"
+	io "io"
 
-	os "os"
+	mock "github.com/stretchr/testify/mock"
 
 	record "github.com/herzrasen/hist/record"
 )
@@ -52,13 +52,13 @@ func (_m *HistClient) Get(index int64) (string, error) {
 	return r0, r1
 }
 
-// Import provides a mock function with given fields: file
-func (_m *HistClient) Import(file *os.File) error {
-	ret := _m.Called(file)
+// Import provides a mock function with given fields: reader
+func (_m *HistClient) Import(reader io.Reader) error {
+	ret := _m.Called(reader)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*os.File) error); ok {
-		r0 = rf(file)
+	if rf, ok := ret.Get(0).(func(io.Reader) error); ok {
+		r0 = rf(reader)
 	} else {
 		r0 = ret.Error(0)
 	}

@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"os"
+	"io"
 	"strconv"
 	"strings"
 	"time"
@@ -16,8 +16,8 @@ type HistoryEntry struct {
 	Command string
 }
 
-func (c *Client) Import(file *os.File) error {
-	entries := parseHistFile(file)
+func (c *Client) Import(reader io.Reader) error {
+	entries := parseHistFile(reader)
 	for _, entry := range entries {
 		err := c.RecordWithTime(entry.Command, entry.Date)
 		if err != nil {
@@ -27,8 +27,8 @@ func (c *Client) Import(file *os.File) error {
 	return nil
 }
 
-func parseHistFile(file *os.File) []HistoryEntry {
-	scanner := bufio.NewScanner(file)
+func parseHistFile(reader io.Reader) []HistoryEntry {
+	scanner := bufio.NewScanner(reader)
 	scanner.Split(splitHistFile)
 	var entries []HistoryEntry
 	for scanner.Scan() {
@@ -48,10 +48,10 @@ func splitHistFile(data []byte, atEOF bool) (advance int, token []byte, err erro
 	}
 	indexOfNewLine := indexOfNewlineWithoutLeadingBackslash(data, 0)
 	if indexOfNewLine >= 0 {
-		return indexOfNewLine + 1, dropCR(data[0:indexOfNewLine]), nil
+		return indexOfNewLine + 1, data[0:indexOfNewLine], nil
 	}
 	if atEOF {
-		return len(data), dropCR(data), nil
+		return len(data), data, nil
 	}
 	// request more data
 	return 0, nil, nil
@@ -69,13 +69,6 @@ func indexOfNewlineWithoutLeadingBackslash(data []byte, accOffset int) int {
 	default:
 		return -1
 	}
-}
-
-func dropCR(data []byte) []byte {
-	if len(data) > 0 && data[len(data)-1] == '\r' {
-		return data[0 : len(data)-1]
-	}
-	return data
 }
 
 func parseHistoryEntry(line string) (HistoryEntry, error) {

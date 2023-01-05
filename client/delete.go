@@ -1,13 +1,10 @@
 package client
 
 import (
+	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"time"
-)
-
-const (
-	stmtDeleteByIds = `DELETE FROM hist WHERE id IN (?)`
 )
 
 type DeleteOptions struct {
@@ -24,12 +21,13 @@ func (c *Client) Delete(options DeleteOptions) error {
 		return c.deleteByPattern(options)
 	case options.UpdatedBefore != nil:
 		return c.deleteUpdatedBefore(options.UpdatedBefore)
+	default:
+		return errors.New("empty DeleteOptions passed")
 	}
-	return nil
 }
 
 func (c *Client) deleteByIds(options DeleteOptions) error {
-	query, args, err := sqlx.In(stmtDeleteByIds, options.Ids)
+	query, args, err := sqlx.In(`DELETE FROM hist WHERE id IN (?)`, options.Ids)
 	if err != nil {
 		return fmt.Errorf("hist.Client.Delete: in: %w", err)
 	}
@@ -59,9 +57,6 @@ func buildDeleteByPatternStatement(pattern string) string {
 }
 
 func (c *Client) deleteUpdatedBefore(t *time.Time) error {
-	if t == nil {
-		return fmt.Errorf("client:Delete:deleteUpdatedBedore: no updatedBefore time provided")
-	}
 	res, err := c.Db.Exec(`DELETE FROM hist WHERE last_update < ?`, &t)
 	if err != nil {
 		return fmt.Errorf("client:Delete:deleteUpdatedBefore: exec: %w", err)

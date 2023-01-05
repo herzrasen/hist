@@ -6,6 +6,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/herzrasen/hist/config"
 	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -35,6 +36,18 @@ func TestClient_Record(t *testing.T) {
 		err := c.Record("ls -alF")
 		require.NoError(t, err)
 	})
+
+	t.Run("succeed with excluded", func(t *testing.T) {
+		c := Client{
+			Config: &config.Config{
+				Patterns: config.Patterns{
+					Excludes: []string{"^ls .*"},
+				}},
+		}
+		err := c.Record("ls -alF")
+		assert.NoError(t, err)
+	})
+
 	t.Run("insert returns error", func(t *testing.T) {
 		db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 		mock.ExpectExec(`INSERT INTO hist (command, last_update) 

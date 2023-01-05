@@ -7,6 +7,7 @@ import (
 	"github.com/herzrasen/hist/client"
 	"github.com/herzrasen/hist/config"
 	"github.com/herzrasen/hist/handler"
+	"github.com/herzrasen/hist/search"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -26,8 +27,10 @@ func main() {
 	if err != nil {
 		log.WithError(err).Fatal("Unable to create client client")
 	}
+	searcher := search.NewSearcher(c)
 	h := handler.Handler{
-		Client: c,
+		Client:   c,
+		Searcher: searcher,
 	}
 	err = h.Handle(a)
 	if err != nil {
