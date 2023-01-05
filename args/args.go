@@ -41,13 +41,13 @@ type StatsCmd struct {
 }
 
 type Args struct {
-	Delete *DeleteCmd `arg:"subcommand:delete"`
-	Get    *GetCmd    `arg:"subcommand:get"`
-	Import *ImportCmd `arg:"subcommand:import"`
-	List   *ListCmd   `arg:"subcommand:list"`
-	Record *RecordCmd `arg:"subcommand:record"`
-	Search *SearchCmd `arg:"subcommand:search"`
-	Stats  *StatsCmd  `arg:"subcommand:stats"`
-	Tidy   *TidyCmd   `arg:"subcommand:tidy"`
+	Delete *DeleteCmd `arg:"subcommand:delete" help:"Delete commands from history"`
+	Get    *GetCmd    `arg:"subcommand:get" help:"Get a command by it's index'"`
+	Import *ImportCmd `arg:"subcommand:import" help:"Import commands from a legacy history file"`
+	List   *ListCmd   `arg:"subcommand:list" help:"List commands"`
+	Record *RecordCmd `arg:"subcommand:record" help:"Record a new command"`
+	Search *SearchCmd `arg:"subcommand:search" help:"Start the interactive fuzzy selection mode"`
+	Stats  *StatsCmd  `arg:"subcommand:stats" help:"Show some statistics"`
+	Tidy   *TidyCmd   `arg:"subcommand:tidy" help:"Apply exlude patterns to clean up the hist database"`
 	Config string     `arg:"--config" default:"~/.config/hist/config.yml"`
 }
