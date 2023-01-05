@@ -5,6 +5,7 @@ import (
 	"github.com/herzrasen/hist/args"
 	"github.com/herzrasen/hist/client"
 	"github.com/herzrasen/hist/record"
+	"github.com/herzrasen/hist/stats"
 	"io"
 	"os"
 )
@@ -16,6 +17,7 @@ type HistClient interface {
 	Delete(options client.DeleteOptions) error
 	Import(reader io.Reader) error
 	Tidy() error
+	Stats() (*stats.Stats, error)
 }
 
 type SearchClient interface {
@@ -85,6 +87,12 @@ func (h *Handler) Handle(a args.Args) error {
 		if err != nil {
 			return fmt.Errorf("unable to tidy hist: %w", err)
 		}
+	case a.Stats != nil:
+		s, err := h.Client.Stats()
+		if err != nil {
+			return fmt.Errorf("unable to get stats: %w", err)
+		}
+		fmt.Printf("%s\n", s.ToString())
 	}
 	return nil
 }

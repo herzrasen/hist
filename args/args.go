@@ -37,13 +37,17 @@ type ImportCmd struct {
 type TidyCmd struct {
 }
 
+type StatsCmd struct {
+}
+
 type Args struct {
+	Delete *DeleteCmd `arg:"subcommand:delete"`
+	Get    *GetCmd    `arg:"subcommand:get"`
+	Import *ImportCmd `arg:"subcommand:import"`
+	List   *ListCmd   `arg:"subcommand:list"`
 	Record *RecordCmd `arg:"subcommand:record"`
 	Search *SearchCmd `arg:"subcommand:search"`
-	Get    *GetCmd    `arg:"subcommand:get"`
-	List   *ListCmd   `arg:"subcommand:list"`
-	Delete *DeleteCmd `arg:"subcommand:delete"`
-	Import *ImportCmd `arg:"subcommand:import"`
+	Stats  *StatsCmd  `arg:"subcommand:stats"`
 	Tidy   *TidyCmd   `arg:"subcommand:tidy"`
 	Config string     `arg:"--config" default:"~/.config/hist/config.yml"`
 }
