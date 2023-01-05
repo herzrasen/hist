@@ -1,5 +1,7 @@
 # hist - Improved shell history
 
+> :warning: **WORK IN PROGRESS**
+
 `hist` aims to be an improvement to the standard history command on Linux
 and Mac based systems (currently only zsh is supported).
 
