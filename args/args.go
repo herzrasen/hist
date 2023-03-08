@@ -9,15 +9,17 @@ type RecordCmd struct {
 }
 
 type SearchCmd struct {
+	Input string `arg:"positional"`
 }
 
 type ListCmd struct {
-	ByCount      bool `arg:"--by-count"`
-	Reverse      bool `arg:"--reverse"`
-	NoCount      bool `arg:"--no-count"`
-	NoLastUpdate bool `arg:"--no-last-update"`
-	WithId       bool `arg:"--with-id"`
-	Limit        int  `arg:"-l,--limit" default:"-1"`
+	Pattern      string `arg:"--pattern"`
+	ByCount      bool   `arg:"--by-count"`
+	Reverse      bool   `arg:"--reverse"`
+	NoCount      bool   `arg:"--no-count"`
+	NoLastUpdate bool   `arg:"--no-last-update"`
+	WithId       bool   `arg:"--with-id"`
+	Limit        int    `arg:"-l,--limit" default:"-1"`
 }
 
 type GetCmd struct {
@@ -48,6 +50,6 @@ type Args struct {
 	Record *RecordCmd `arg:"subcommand:record" help:"Record a new command"`
 	Search *SearchCmd `arg:"subcommand:search" help:"Start the interactive fuzzy selection mode"`
 	Stats  *StatsCmd  `arg:"subcommand:stats" help:"Show some statistics"`
-	Tidy   *TidyCmd   `arg:"subcommand:tidy" help:"Apply exlude patterns to clean up the hist database"`
+	Tidy   *TidyCmd   `arg:"subcommand:tidy" help:"Apply exclude patterns to clean up the hist database"`
 	Config string     `arg:"--config" default:"~/.config/hist/config.yml"`
 }

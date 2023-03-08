@@ -130,7 +130,8 @@ func TestHandler_Handle(t *testing.T) {
 
 	t.Run("handle search", func(t *testing.T) {
 		s := mocks.NewSearchClient(t)
-		s.On("Show").Return(nil)
+		s.On("Show", mock.Anything).
+			Return(nil)
 		h := Handler{
 			Searcher: s,
 		}
@@ -142,7 +143,8 @@ func TestHandler_Handle(t *testing.T) {
 
 	t.Run("search error", func(t *testing.T) {
 		s := mocks.NewSearchClient(t)
-		s.On("Show").Return(errors.New("some error"))
+		s.On("Show", mock.Anything).
+			Return(errors.New("some error"))
 		h := Handler{
 			Searcher: s,
 		}
