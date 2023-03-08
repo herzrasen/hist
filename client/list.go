@@ -8,6 +8,7 @@ import (
 )
 
 type ListOptions struct {
+	Pattern      string
 	ByCount      bool
 	Reverse      bool
 	NoCount      bool
@@ -48,6 +49,9 @@ func (c *Client) List(options ListOptions) ([]record.Record, error) {
 func buildListQuery(options ListOptions) (string, []interface{}, error) {
 	query := strings.Builder{}
 	query.WriteString(`SELECT id, command, last_update, count FROM hist`)
+	if options.Pattern != "" {
+		query.WriteString(fmt.Sprintf(" WHERE regexp('%s', command) = true", options.Pattern))
+	}
 	if options.ByCount {
 		query.WriteString(" ORDER BY count, last_update DESC")
 	} else {

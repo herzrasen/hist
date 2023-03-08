@@ -79,7 +79,7 @@ func NewSearcher(listClient ListClient) *Searcher {
 	}
 }
 
-func (s *Searcher) Show() error {
+func (s *Searcher) Show(input string) error {
 	records, err := s.ListClient.List(client.ListOptions{
 		Reverse: true,
 	})
@@ -104,6 +104,7 @@ func (s *Searcher) Show() error {
 	currentItem, _ := s.List.GetItemText(0)
 	s.List.SetCurrentItem(0)
 	s.List.SetItemText(0, "> "+currentItem, "")
+	s.Input.SetText(input)
 	if err := s.App.Run(); err != nil {
 		return fmt.Errorf("search:Searcher:Show: run: %w", err)
 	}

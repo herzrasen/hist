@@ -50,7 +50,7 @@ Commands:
   record                 Record a new command
   search                 Start the interactive fuzzy selection mode
   stats                  Show some statistics
-  tidy                   Apply exlude patterns to clean up the hist database
+  tidy                   Apply exclude patterns to clean up the hist database
 ````
 
 ### Delete

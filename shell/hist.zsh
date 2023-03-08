@@ -61,8 +61,9 @@ bindkey -M viins "^[[B"     hist-forward-widget
 bindkey -M vicmd "^[[B"     hist-forward-widget
 
 hist-search-widget() {
+    buf=$BUFFER
     zle reset-prompt
-    command=$(hist search)
+    command=$(hist search $buf)
     ret=$?
     if [ $ret -ne 0 ]; then
         zle reset-prompt
