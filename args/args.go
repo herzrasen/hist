@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+var Version = ""
+
 type RecordCmd struct {
 	Command string `arg:"positional"`
 }
@@ -52,4 +54,8 @@ type Args struct {
 	Stats  *StatsCmd  `arg:"subcommand:stats" help:"Show some statistics"`
 	Tidy   *TidyCmd   `arg:"subcommand:tidy" help:"Apply exclude patterns to clean up the hist database"`
 	Config string     `arg:"--config" default:"~/.config/hist/config.yml"`
+}
+
+func (a *Args) Version() string {
+	return "hist " + Version
 }
