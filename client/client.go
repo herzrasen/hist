@@ -13,6 +13,7 @@ import (
 type Client struct {
 	Db     *sqlx.DB
 	Config *config.Config
+	path   string
 }
 
 func NewSqliteClient(path string, cfg *config.Config) (*Client, error) {
@@ -39,5 +40,6 @@ func NewSqliteClient(path string, cfg *config.Config) (*Client, error) {
 	return &Client{
 		Db:     db,
 		Config: cfg,
+		path:   path,
 	}, nil
 }

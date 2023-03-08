@@ -9,6 +9,7 @@ import (
 
 func TestNewClient(t *testing.T) {
 	c := CreateTestClient(t)
+	defer os.Remove(c.path)
 	rows, err := c.Db.Query("SELECT name FROM sqlite_schema")
 	require.NoError(t, err)
 	defer rows.Close()
