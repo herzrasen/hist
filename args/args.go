@@ -1,10 +1,16 @@
 package args
 
 import (
+	"fmt"
 	"time"
 )
 
-var Version = ""
+// the following vars will be set by goreleaser on build time
+var (
+	Version = "unknown"
+	Commit  = "unknown"
+	Date    = "unknown"
+)
 
 type RecordCmd struct {
 	Command string `arg:"positional"`
@@ -57,5 +63,5 @@ type Args struct {
 }
 
 func (a *Args) Version() string {
-	return "hist " + Version
+	return fmt.Sprintf("hist %s\nCommit: %s\nDate: %s", Version, Commit, Date)
 }
