@@ -18,5 +18,5 @@ jobs:
         with:
           go-version: '^1.20' # The Go version to download (if necessary) and use.
 
-      - name: Build artifact
-        run: make all
+      - name: Tests
+        run: make test
