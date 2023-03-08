@@ -1,0 +1,20 @@
+---
+project_name: hist
+before:
+  hooks:
+    - go mod download
+builds:
+  - main: ./main.go
+    binary: hist
+    ldflags:
+      - -s -w -X github.com/herzrasen/hist/args/Version=v{{.Version}}
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+archives:
+  - files:
+      - README.md
+      - LICENSE
