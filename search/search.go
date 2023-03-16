@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/herzrasen/hist/client"
+	"github.com/herzrasen/hist/fuzzy"
 	"github.com/herzrasen/hist/record"
-	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/rivo/tview"
-	"sort"
 	"strings"
 )
 
@@ -79,26 +78,26 @@ func NewSearcher(listClient ListClient) *Searcher {
 	}
 }
 
-func (s *Searcher) Show(input string) error {
+func (s *Searcher) Show(input string, verbose bool) error {
 	records, err := s.ListClient.List(client.ListOptions{
-		Reverse: true,
+		Reverse: false,
 	})
 	if err != nil {
 		return fmt.Errorf("search:Searcher:Show: list: %w", err)
 	}
-	var commands []string
+
 	for _, rec := range records {
-		commands = append(commands, rec.Command)
-	}
-	for _, command := range commands {
-		s.List.AddItem(command, "", 0, nil)
+		s.List.AddItem(rec.Command, "", 0, nil)
 	}
 	s.Input.SetChangedFunc(func(text string) {
-		ranks := fuzzy.RankFind(text, commands)
-		sort.Sort(ranks)
+		weightedRecords := fuzzy.Search(records, text)
 		s.List.Clear()
-		for _, rankedCommand := range ranks {
-			s.List.AddItem(rankedCommand.Target, "", 0, nil)
+		for _, weightedRecord := range weightedRecords {
+			item := weightedRecord.Command
+			if verbose {
+				item = fmt.Sprintf("(weight: %d, len: %d) %s", weightedRecord.Weight, len(weightedRecords), weightedRecord.Command)
+			}
+			s.List.AddItem(item, "", 0, nil)
 		}
 	})
 	currentItem, _ := s.List.GetItemText(0)
