@@ -14,7 +14,9 @@ builds:
     goarch:
       - amd64
       - arm64
-  - env:
+    goamd64:
+      - v2
+    env:
       - CGO_ENABLED=1
 archives:
   - files:
