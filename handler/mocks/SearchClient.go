@@ -9,13 +9,13 @@ type SearchClient struct {
 	mock.Mock
 }
 
-// Show provides a mock function with given fields: input
-func (_m *SearchClient) Show(input string) error {
-	ret := _m.Called(input)
+// Show provides a mock function with given fields: input, verbose
+func (_m *SearchClient) Show(input string, verbose bool) error {
+	ret := _m.Called(input, verbose)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string) error); ok {
-		r0 = rf(input)
+	if rf, ok := ret.Get(0).(func(string, bool) error); ok {
+		r0 = rf(input, verbose)
 	} else {
 		r0 = ret.Error(0)
 	}

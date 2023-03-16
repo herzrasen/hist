@@ -17,7 +17,8 @@ type RecordCmd struct {
 }
 
 type SearchCmd struct {
-	Input string `arg:"positional"`
+	Input   string `arg:"positional"`
+	Verbose bool   `arg:"--verbose"`
 }
 
 type ListCmd struct {

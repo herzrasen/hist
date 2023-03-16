@@ -21,7 +21,7 @@ type HistClient interface {
 }
 
 type SearchClient interface {
-	Show(input string) error
+	Show(input string, verbose bool) error
 }
 
 type Handler struct {
@@ -44,7 +44,7 @@ func (h *Handler) Handle(a args.Args) error {
 		}
 		fmt.Printf("%s", command)
 	case a.Search != nil:
-		err := h.Searcher.Show(a.Search.Input)
+		err := h.Searcher.Show(a.Search.Input, a.Search.Verbose)
 		if err != nil {
 			return fmt.Errorf("unable to show search dialog: %w", err)
 		}
