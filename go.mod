@@ -6,7 +6,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/adrg/xdg v0.4.0
 	github.com/alexflint/go-arg v1.4.3
-	github.com/fatih/color v1.14.1
+	github.com/fatih/color v1.15.0
 	github.com/gdamore/tcell/v2 v2.6.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/rivo/tview v0.0.0-20230226195229-47e7db7885b4
