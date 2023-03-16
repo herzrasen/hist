@@ -17,7 +17,7 @@ type Client struct {
 }
 
 func NewSqliteClient(path string, cfg *config.Config) (*Client, error) {
-	err := sqlite.RegisterScalarFunction("sqlite_regex", 2, func(ctx *sqlite.FunctionContext, args []driver.Value) (driver.Value, error) {
+	err := sqlite.RegisterScalarFunction("regexp", 2, func(ctx *sqlite.FunctionContext, args []driver.Value) (driver.Value, error) {
 		pattern := args[0].(string)
 		s := args[1].(string)
 		return regexp.MatchString(pattern, s)
