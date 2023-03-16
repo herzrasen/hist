@@ -1,12 +1,12 @@
 package client
 
 import (
-	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"github.com/herzrasen/hist/config"
 	"github.com/jmoiron/sqlx"
-	"github.com/mattn/go-sqlite3"
-	_ "github.com/mattn/go-sqlite3"
+	"modernc.org/sqlite"
+	_ "modernc.org/sqlite"
 	"regexp"
 )
 
@@ -17,14 +17,15 @@ type Client struct {
 }
 
 func NewSqliteClient(path string, cfg *config.Config) (*Client, error) {
-	regex := func(pattern string, s string) (bool, error) {
+	err := sqlite.RegisterScalarFunction("sqlite_regex", 2, func(ctx *sqlite.FunctionContext, args []driver.Value) (driver.Value, error) {
+		pattern := args[0].(string)
+		s := args[1].(string)
 		return regexp.MatchString(pattern, s)
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error registering scalar function %w", err)
 	}
-	sql.Register("sqlite3_regex", &sqlite3.SQLiteDriver{
-		ConnectHook: func(conn *sqlite3.SQLiteConn) error {
-			return conn.RegisterFunc("regexp", regex, true)
-		}})
-	db, err := sqlx.Open("sqlite3_regex", path)
+	db, err := sqlx.Open("sqlite", path)
 	if err != nil {
 		return nil, fmt.Errorf("client:NewSqliteClient: open: %w", err)
 	}
