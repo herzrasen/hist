@@ -7,7 +7,6 @@ import (
 	"github.com/herzrasen/hist/fuzzy"
 	"github.com/herzrasen/hist/record"
 	"github.com/rivo/tview"
-	"strings"
 )
 
 type ListClient interface {
@@ -26,8 +25,14 @@ func NewSearcher(listClient ListClient) *Searcher {
 	list := tview.NewList().
 		ShowSecondaryText(false).
 		SetShortcutStyle(tcell.Style{}).
+		SetSelectedStyle(tcell.StyleDefault.
+			Foreground(tcell.ColorPaleGreen)).
+		SetMainTextColor(tcell.ColorViolet).
 		SetWrapAround(true)
 	input := tview.NewInputField()
+	input.SetFieldStyle(tcell.StyleDefault.
+		Italic(true).
+		Foreground(tcell.ColorLightBlue))
 	flex := tview.NewFlex().SetDirection(tview.FlexRow).
 		AddItem(list, 0, 20, false).
 		AddItem(input, 0, 2, true)
@@ -37,8 +42,6 @@ func NewSearcher(listClient ListClient) *Searcher {
 		SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 			numItems := list.GetItemCount() - 1
 			currentItem := list.GetCurrentItem()
-			oldItemText, _ := list.GetItemText(currentItem)
-			list.SetItemText(currentItem, strings.TrimPrefix(oldItemText, "> "), "")
 			switch event.Key() {
 			case tcell.KeyEnter:
 				selectedIndex := list.GetCurrentItem()
@@ -51,8 +54,6 @@ func NewSearcher(listClient ListClient) *Searcher {
 					nextItem = currentItem - 1
 				}
 				list.SetCurrentItem(nextItem)
-				itemText, _ := list.GetItemText(nextItem)
-				list.SetItemText(nextItem, "> "+itemText, "")
 				return nil
 			case tcell.KeyDown:
 				nextItem := currentItem + 1
@@ -60,8 +61,6 @@ func NewSearcher(listClient ListClient) *Searcher {
 					nextItem = numItems
 				}
 				list.SetCurrentItem(nextItem)
-				itemText, _ := list.GetItemText(nextItem)
-				list.SetItemText(nextItem, "> "+itemText, "")
 				return nil
 			}
 			return event
