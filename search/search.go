@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/herzrasen/hist/client"
-	"github.com/herzrasen/hist/fuzzy"
 	"github.com/herzrasen/hist/record"
 	"github.com/rivo/tview"
 )
@@ -78,33 +77,31 @@ func NewSearcher(listClient ListClient) *Searcher {
 }
 
 func (s *Searcher) Show(input string, verbose bool) error {
-	records, err := s.ListClient.List(client.ListOptions{
+	recs, err := s.ListClient.List(client.ListOptions{
 		Reverse: false,
 	})
 	if err != nil {
-		return fmt.Errorf("search:Searcher:Show: list: %w", err)
+		return fmt.Errorf("list: %w", err)
 	}
-
-	for _, rec := range records {
-		s.List.AddItem(rec.Command, "", 0, nil)
-	}
+	records := record.Records(recs)
 	s.Input.SetChangedFunc(func(text string) {
-		weightedRecords := fuzzy.Search(records, text)
+		updatedRecords := records.Search(text)
 		s.List.Clear()
-		for _, weightedRecord := range weightedRecords {
-			item := weightedRecord.Command
+		for _, updatedRecord := range updatedRecords {
+			item := updatedRecord.Command
 			if verbose {
-				item = fmt.Sprintf("(weight: %d, len: %d) %s", weightedRecord.Weight, len(weightedRecords), weightedRecord.Command)
+				item = fmt.Sprintf("(weight: %d, len: %d) %s",
+					updatedRecord.Weight,
+					len(updatedRecords),
+					updatedRecord.Command,
+				)
 			}
 			s.List.AddItem(item, "", 0, nil)
 		}
 	})
-	currentItem, _ := s.List.GetItemText(0)
-	s.List.SetCurrentItem(0)
-	s.List.SetItemText(0, "> "+currentItem, "")
 	s.Input.SetText(input)
 	if err := s.App.Run(); err != nil {
-		return fmt.Errorf("search:Searcher:Show: run: %w", err)
+		return fmt.Errorf("run: %w", err)
 	}
 	return nil
 }
