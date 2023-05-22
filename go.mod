@@ -11,7 +11,7 @@ require (
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/rivo/tview v0.0.0-20230226195229-47e7db7885b4
 	github.com/sirupsen/logrus v1.9.0
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.21.1
 )
