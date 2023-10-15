@@ -37,9 +37,10 @@ func (r *Record) Format(options FormatOptions) string {
 }
 
 func (r *Record) UpdateWeight(input string) {
-	inputOccurrences := countOccurrences(input)
-	inputTuples := splitIntoChunks(input, 2)
-	inputTriples := splitIntoChunks(input, 3)
+	in := strings.ReplaceAll(input, " ", "")
+	inputOccurrences := countOccurrences(in)
+	inputTuples := splitIntoChunks(in, 2)
+	inputTriples := splitIntoChunks(in, 3)
 	compact := strings.Join(strings.Fields(r.Command), "")
 	occurrences := countOccurrences(compact)
 	r.Weight = weightOccurrences(occurrences, inputOccurrences)
@@ -48,8 +49,53 @@ func (r *Record) UpdateWeight(input string) {
 		triples := splitIntoChunks(compact, 3)
 		r.Weight += weightChunks(tuples, inputTuples) +
 			weightChunks(triples, inputTriples) +
-			r.Count
+			weightPrefix(in, compact) +
+			weightLastUpdate(r.LastUpdate) +
+			weightCount(r.Count)
 	}
+}
+
+func weightCount(count uint64) uint64 {
+	if count > 100 {
+		return 100
+	}
+	return count
+}
+
+func weightLastUpdate(lastUpdate time.Time) uint64 {
+	now := time.Now()
+	diff := now.Sub(lastUpdate)
+	if diff < 0 {
+		diff = -diff
+	}
+	// Calculate a scaling factor to limit the return value to a maximum of 100.
+	maxValue := uint64(100)
+	scaleFactor := maxValue / uint64(time.Second.Seconds())
+
+	// Convert the time difference to a uint64 and apply the scaling factor.
+	score := uint64(diff.Seconds()) * scaleFactor
+
+	// Ensure the score does not exceed the maximum value of 100.
+	if score > maxValue {
+		score = maxValue
+	}
+	return score
+}
+
+func weightPrefix(input string, command string) uint64 {
+	var weight uint64
+	inputRunes := []rune(input)
+	commandRunes := []rune(command)
+	for idx, inputRune := range inputRunes {
+		if len(commandRunes) > idx {
+			if commandRunes[idx] == inputRune {
+				weight += 100
+			} else {
+				break
+			}
+		}
+	}
+	return weight
 }
 
 func countOccurrences(input string) map[rune]uint64 {
@@ -86,7 +132,7 @@ func weightChunks(tuples []string, input []string) uint64 {
 	for _, t := range tuples {
 		for _, i := range input {
 			if t == i {
-				weight += uint64(len(i))
+				weight += uint64(len(i) * 10)
 			}
 		}
 	}
