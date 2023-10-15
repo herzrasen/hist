@@ -6,10 +6,10 @@
 and Mac based systems (currently only zsh is supported).
 
 Command history is stored in an `sqlite3` database (located in the user's
-XDG DataDir).
+XDG `DataDir`).
 
 Certain commands can be ignored by defining exclude patterns in the config file
-(located in the user's XSD ConfigDir).
+(located in the user's XDG `ConfigDir`).
 
 An interactive search mode is bound to the `ctrl-c` command. It used a fuzzy
 search mode to select a command from your command history.
@@ -81,12 +81,14 @@ Options:
 
 ### Import
 
+Import your current ZSH history into `hist`'s database
 ```shell
 Usage: hist import [PATH]
 
 Positional arguments:
   PATH
 ```
+
 ### List
 
 ```shell
@@ -111,17 +113,23 @@ Positional arguments:
 
 ### Search
 
+Start the interactive fuzzy selection mode
+
 ```shell
 Usage: hist search
 ```
 
 ### Stats
 
+Show some statistics
+
 ```shell
 Usage: hist stats
 ```
 
 ### Tidy
+
+Apply exclude patterns to clean up the hist database
 
 ```shell
 Usage: hist tidy
@@ -139,3 +147,12 @@ make && sudo make install
 
 Also make sure that you source the shell script in your
 `.zshrc` 
+
+# Creating a new release
+
+```shell
+git checkout main
+git pull
+git tag <version-tag>
+git push --tags
+```
