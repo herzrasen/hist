@@ -1,14 +1,16 @@
 autoload -U add-zsh-hook
 
 function TRAPINT() {
-    __HIST_COMMAND_INDEX=0
+    __HIST_COMMAND_INDEX=-1
+    __HIST_DIRECTION="backward"
     [[ -o zle ]] && zle reset-prompt
     # return 128 plus the signal number
     return $(( 128 + $1 ))
 }
 
 function hist-record() {
-    __HIST_COMMAND_INDEX=0
+    __HIST_COMMAND_INDEX=-1
+    __HIST_DIRECTION="backward"
     hist record "$1"
 }
 add-zsh-hook preexec hist-record
@@ -36,10 +38,12 @@ bindkey -M vicmd "^[[A"     hist-backward-widget
 
 hist-forward-widget() {
     if [ ${__HIST_DIRECTION:="forward"} = "backward" ]; then
-        __HIST_COMMAND_INDEX=$((__HIST_COMMAND_INDEX-1))
         __HIST_DIRECTION="forward"
+        # decrement counter once when the direction is changed
+        __HIST_COMMAND_INDEX=$((__HIST_COMMAND_INDEX-1))
     fi
     if [ ${__HIST_COMMAND_INDEX:=0} -gt 0 ]; then
+        # decrement for every keystroke
         __HIST_COMMAND_INDEX=$((__HIST_COMMAND_INDEX-1))
         command=$(hist get --index $__HIST_COMMAND_INDEX)
         ret=$?
