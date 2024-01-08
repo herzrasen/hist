@@ -3,7 +3,7 @@ module github.com/herzrasen/hist
 go 1.20
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/adrg/xdg v0.4.0
 	github.com/alexflint/go-arg v1.4.3
 	github.com/fatih/color v1.15.0
