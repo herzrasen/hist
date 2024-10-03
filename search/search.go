@@ -84,24 +84,29 @@ func (s *Searcher) Show(input string, verbose bool) error {
 		return fmt.Errorf("list: %w", err)
 	}
 	records := record.Records(recs)
+	s.showRecords(records, verbose)
 	s.Input.SetChangedFunc(func(text string) {
 		updatedRecords := records.Search(text)
-		s.List.Clear()
-		for _, updatedRecord := range updatedRecords {
-			item := updatedRecord.Command
-			if verbose {
-				item = fmt.Sprintf("(weight: %d, len: %d) %s",
-					updatedRecord.Weight,
-					len(updatedRecords),
-					updatedRecord.Command,
-				)
-			}
-			s.List.AddItem(item, "", 0, nil)
-		}
+		s.showRecords(updatedRecords, verbose)
 	})
 	s.Input.SetText(input)
 	if err := s.App.Run(); err != nil {
 		return fmt.Errorf("run: %w", err)
 	}
 	return nil
+}
+
+func (s *Searcher) showRecords(records record.Records, verbose bool) {
+	s.List.Clear()
+	for _, updatedRecord := range records {
+		item := updatedRecord.Command
+		if verbose {
+			item = fmt.Sprintf("(weight: %d, len: %d) %s",
+				updatedRecord.Weight,
+				len(records),
+				updatedRecord.Command,
+			)
+		}
+		s.List.AddItem(item, "", 0, nil)
+	}
 }
