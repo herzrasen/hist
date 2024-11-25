@@ -19,9 +19,9 @@ func TestClient_Stats(t *testing.T) {
 			AddRow(2, "command-2", baseTime.Add(-1*time.Minute), 2).
 			AddRow(3, "command-3", baseTime.Add(-3*time.Minute), 10).
 			AddRow(3, "command-4", baseTime.Add(-2*time.Minute), 10)
-		mock.ExpectQuery(`SELECT id, command, last_update, count 
-			FROM hist 
-			ORDER BY last_update, count DESC`).
+		mock.ExpectQuery(`SELECT h.id, h.command, h.last_update, h.count, null 
+			FROM hist h 
+			ORDER BY h.last_update, h.count DESC`).
 			WillReturnRows(rows)
 		c := Client{
 			Db: sqlx.NewDb(db, "sqlite3"),

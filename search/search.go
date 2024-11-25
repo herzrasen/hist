@@ -76,7 +76,7 @@ func NewSearcher(listClient ListClient) *Searcher {
 	}
 }
 
-func (s *Searcher) Show(input string, verbose bool) error {
+func (s *Searcher) Show(input string) error {
 	recs, err := s.ListClient.List(client.ListOptions{
 		Reverse: false,
 	})
@@ -84,10 +84,17 @@ func (s *Searcher) Show(input string, verbose bool) error {
 		return fmt.Errorf("list: %w", err)
 	}
 	records := record.Records(recs)
-	s.showRecords(records, verbose)
+	s.showRecords(records)
 	s.Input.SetChangedFunc(func(text string) {
-		updatedRecords := records.Search(text)
-		s.showRecords(updatedRecords, verbose)
+		recs, err := s.ListClient.List(client.ListOptions{
+			Pattern: text,
+			Reverse: true,
+		})
+		if err != nil {
+			return
+		}
+		records := record.Records(recs).Search(text)
+		s.showRecords(records)
 	})
 	s.Input.SetText(input)
 	if err := s.App.Run(); err != nil {
@@ -96,16 +103,12 @@ func (s *Searcher) Show(input string, verbose bool) error {
 	return nil
 }
 
-func (s *Searcher) showRecords(records record.Records, verbose bool) {
+func (s *Searcher) showRecords(records record.Records) {
 	s.List.Clear()
-	for _, updatedRecord := range records {
-		item := updatedRecord.Command
-		if verbose {
-			item = fmt.Sprintf("(weight: %d, len: %d) %s",
-				updatedRecord.Weight,
-				len(records),
-				updatedRecord.Command,
-			)
+	for _, r := range records {
+		var item = r.Command
+		if r.Tag != nil {
+			item = fmt.Sprintf("*%s", r.Command)
 		}
 		s.List.AddItem(item, "", 0, nil)
 	}

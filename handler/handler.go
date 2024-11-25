@@ -16,12 +16,13 @@ type HistClient interface {
 	Record(command string) error
 	Delete(options client.DeleteOptions) error
 	Import(reader io.Reader) error
+	Tag(id int64, tags []string, remove bool) error
 	Tidy() error
 	Stats() (*stats.Stats, error)
 }
 
 type SearchClient interface {
-	Show(input string, verbose bool) error
+	Show(input string) error
 }
 
 type Handler struct {
@@ -44,7 +45,7 @@ func (h *Handler) Handle(a args.Args) error {
 		}
 		fmt.Printf("%s", command)
 	case a.Search != nil:
-		err := h.Searcher.Show(a.Search.Input, a.Search.Verbose)
+		err := h.Searcher.Show(a.Search.Input)
 		if err != nil {
 			return fmt.Errorf("unable to show search dialog: %w", err)
 		}
@@ -57,6 +58,7 @@ func (h *Handler) Handle(a args.Args) error {
 			NoLastUpdate: a.List.NoLastUpdate,
 			WithId:       a.List.WithId,
 			Limit:        a.List.Limit,
+			Tagged:       a.List.Tagged,
 		}
 		records, err := h.Client.List(options)
 		if err != nil {
@@ -82,6 +84,11 @@ func (h *Handler) Handle(a args.Args) error {
 		err = h.Client.Import(file)
 		if err != nil {
 			return fmt.Errorf("unable to import history: %w", err)
+		}
+	case a.Tag != nil:
+		err := h.Client.Tag(a.Tag.Id, a.Tag.Tags, a.Tag.Remove)
+		if err != nil {
+			return fmt.Errorf("unable to update tags: %w", err)
 		}
 	case a.Tidy != nil:
 		err := h.Client.Tidy()

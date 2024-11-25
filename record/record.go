@@ -2,6 +2,7 @@ package record
 
 import (
 	"github.com/fatih/color"
+	"math"
 	"strings"
 	"time"
 	"unicode"
@@ -13,6 +14,7 @@ type Record struct {
 	LastUpdate time.Time
 	Count      uint64
 	Weight     uint64
+	Tag        *string
 }
 
 type FormatOptions struct {
@@ -31,6 +33,9 @@ func (r *Record) Format(options FormatOptions) string {
 	}
 	if options.WithId {
 		buf.WriteString(color.YellowString("%d\t", r.Id))
+	}
+	if r.Tag != nil {
+		buf.WriteString("*")
 	}
 	buf.WriteString(r.Command)
 	return buf.String()
@@ -51,8 +56,15 @@ func (r *Record) UpdateWeight(input string) {
 			weightChunks(triples, inputTriples) +
 			weightPrefix(in, compact) +
 			weightLastUpdate(r.LastUpdate) +
-			weightCount(r.Count)
+			weightCount(r.Count) + weightTag(r.Tag)
 	}
+}
+
+func weightTag(tag *string) uint64 {
+	if tag != nil {
+		return math.MaxInt16
+	}
+	return 0
 }
 
 func weightCount(count uint64) uint64 {

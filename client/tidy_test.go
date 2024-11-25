@@ -13,12 +13,12 @@ import (
 func TestClient_Tidy(t *testing.T) {
 	t.Run("succeed", func(t *testing.T) {
 		db, mock, _ := sqlmock.New()
-		mock.ExpectQuery(`SELECT id, command, last_update, count 
-          FROM hist 
-          ORDER BY last_update, count DESC`).
-			WillReturnRows(sqlmock.NewRows([]string{"id", "command", "last_update", "count"}).
-				AddRow(1, "ls -alF", time.Now().Add(-5*time.Second), 100).
-				AddRow(2, "git push", time.Now(), 10))
+		mock.ExpectQuery(`SELECT h.id, h.command, h.last_update, h.count, null 
+          FROM hist h 
+          ORDER BY h.last_update, h.count DESC`).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "command", "last_update", "count", "tag"}).
+				AddRow(1, "ls -alF", time.Now().Add(-5*time.Second), 100, nil).
+				AddRow(2, "git push", time.Now(), 10, nil))
 		mock.ExpectExec("DELETE FROM hist WHERE id IN (?)").
 			WithArgs(1).
 			WillReturnResult(sqlmock.NewResult(0, 1))

@@ -14,5 +14,9 @@ func (c *Client) Tidy() error {
 			fmt.Printf("Deleting: %s\n", r.Command)
 		}
 	}
+	if len(idsToDelete) == 0 {
+		fmt.Println("Nothing found to tidy up")
+		return nil
+	}
 	return c.Delete(DeleteOptions{Ids: idsToDelete})
 }

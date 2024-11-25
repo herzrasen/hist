@@ -29,6 +29,7 @@ type ListCmd struct {
 	NoLastUpdate bool   `arg:"--no-last-update"`
 	WithId       bool   `arg:"--with-id"`
 	Limit        int    `arg:"-l,--limit" default:"-1"`
+	Tagged       bool   `arg:"--tagged" default:"false"`
 }
 
 type GetCmd struct {
@@ -45,6 +46,12 @@ type ImportCmd struct {
 	Path string `arg:"positional"`
 }
 
+type TagCmd struct {
+	Id     int64    `arg:"-i,--id,required"`
+	Remove bool     `arg:"-r,--remove"`
+	Tags   []string `arg:"positional"`
+}
+
 type TidyCmd struct {
 }
 
@@ -59,6 +66,7 @@ type Args struct {
 	Record *RecordCmd `arg:"subcommand:record" help:"Record a new command"`
 	Search *SearchCmd `arg:"subcommand:search" help:"Start the interactive fuzzy selection mode"`
 	Stats  *StatsCmd  `arg:"subcommand:stats" help:"Show some statistics"`
+	Tag    *TagCmd    `arg:"subcommand:tag" help:"Add/remove tags from a command"`
 	Tidy   *TidyCmd   `arg:"subcommand:tidy" help:"Apply exclude patterns to clean up the hist database"`
 	Config string     `arg:"--config" default:"~/.config/hist/config.yml"`
 }

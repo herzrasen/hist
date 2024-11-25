@@ -29,6 +29,10 @@ func NewSqliteClient(path string, cfg *config.Config) (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("client:NewSqliteClient: open: %w", err)
 	}
+	_, err = db.Exec("PRAGMA foreign_keys = ON;")
+	if err != nil {
+		return nil, fmt.Errorf("unable to turn foreign keys on: %w", err)
+	}
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS hist (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         command TEXT UNIQUE,
@@ -36,7 +40,17 @@ func NewSqliteClient(path string, cfg *config.Config) (*Client, error) {
         count INTEGER DEFAULT 1
     )`)
 	if err != nil {
-		return nil, fmt.Errorf("client:NewSqliteClient: create table: %w", err)
+		return nil, fmt.Errorf("client: NewSqliteClient: create table 'hist': %w", err)
+	}
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS tag (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    	tag TEXT NOT NULL,
+    	hist_id INTEGER,
+    	FOREIGN KEY (hist_id) REFERENCES hist(id) ON DELETE CASCADE,
+    	UNIQUE (hist_id, tag)
+	)`)
+	if err != nil {
+		return nil, fmt.Errorf("client: NewSqliteClient: create table 'tag': %w", err)
 	}
 	return &Client{
 		Db:     db,
