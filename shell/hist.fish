@@ -18,8 +18,10 @@ function hist_down
     end
     if test $hist_counter -gt 0
         set -g hist_counter (math $hist_counter - 1)
+        commandline -r (hist get --index $hist_counter)
+    else
+        commandline -r ""
     end
-    commandline -r (hist get --index $hist_counter)
 end
 
 function hist_enter

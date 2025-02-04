@@ -9,3 +9,7 @@ metadata:
     github.com/project-slug: herzrasen/hist
   tags:
     - go
+spec:
+  type: service
+  owner: group:herzrasen
+  lifecycle: production
