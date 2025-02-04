@@ -1,0 +1,11 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: hist
+  title: hist
+  description: Great stuff with shell history
+  annotations:
+    github.com/project-slug: herzrasen/hist
+  tags:
+    - go
