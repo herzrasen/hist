@@ -7,7 +7,7 @@ require (
 	github.com/adrg/xdg v0.5.3
 	github.com/alexflint/go-arg v1.6.1
 	github.com/fatih/color v1.19.0
-	github.com/gdamore/tcell/v2 v2.13.9
+	github.com/gdamore/tcell/v2 v2.13.10
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/rivo/tview v0.42.0
 	github.com/sirupsen/logrus v1.9.4
