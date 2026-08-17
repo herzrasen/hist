@@ -10,7 +10,7 @@ require (
 	github.com/gdamore/tcell/v2 v2.13.9
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/rivo/tview v0.42.0
-	github.com/sirupsen/logrus v1.9.4
+	github.com/sirupsen/logrus v1.10.0
 	github.com/stretchr/testify v1.11.1
 	gopkg.in/yaml.v3 v3.0.1
 	modernc.org/sqlite v1.50.1
